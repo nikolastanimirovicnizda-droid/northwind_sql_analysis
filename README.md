@@ -29,10 +29,10 @@ The analysis builds upon relational core tables (`orders`, `order_details`, `pro
 ---
 
 ### 3. Methodology
-* **a) Data Preparation & ETL:** Cleaned and validated raw transactional tables in PostgreSQL; mapped primary/foreign keys and handled numeric precision casting (`::numeric`).
-* **b) Advanced SQL Analytics:** Executed Common Table Expressions (CTEs), window functions (`DISTINCT ON`, `NTILE`, `LAG`, `SUM OVER`), and aggregated pricing logic.
-* **c) Data Modeling:** Structured 1-to-many single-direction relationships between dimension tables and transaction records in Power BI.
-* **d) Dashboard Development:** Built a 3-page interactive report (*Executive Summary*, *Sales Analysis*, *Customer Analysis*) with dedicated DAX measures.
+
+* **a) Advanced SQL Analytics:** Executed Common Table Expressions (CTEs), window functions (`DISTINCT ON`, `NTILE`, `LAG`, `SUM OVER`), and aggregated pricing logic in PostgreSQL to extract key metrics.
+* **b) Data Modeling:** Structured 1-to-many single-direction relationships between dimension tables and transaction records in Power BI.
+* **c) Dashboard Development:** Built a 3-page interactive report (*Executive Summary*, *Sales Analysis*, *Customer Analysis*) with dedicated DAX measures.
 
 ---
 
