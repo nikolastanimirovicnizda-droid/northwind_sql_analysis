@@ -183,7 +183,7 @@ JOIN customers c ON c.customer_id = o.customer_id
 GROUP BY company_name
 ORDER BY total_revenue DESC
 
---Customer Segmentation by Spend Queartile (NTILE)
+--Customer Segmentation by Spend Quartile (NTILE)
 
 WITH total_revenue_customer AS (
 	SELECT c.company_name, SUM(od.unit_price * od.quantity * (1 - od.discount)) AS total_spent
