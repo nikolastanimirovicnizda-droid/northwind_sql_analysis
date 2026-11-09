@@ -40,9 +40,6 @@ The analysis builds upon relational core tables (`orders`, `order_details`, `pro
 * **Geographical & Account Concentration:** The United States and Germany represent the largest market shares by total revenue, with top accounts (e.g., QUICK-Stop, Ernst Handel) driving a significant portion of total sales.
 * **Product Portfolio Leaders:** Beverages and Dairy Products lead total category revenue, while specific high-ticket items drive maximum overall profitability.
 * **Inventory Alerts:** Several active items (e.g., Gorgonzola Telino, Louisiana Hot Spiced Okra) sit below designated reorder levels, requiring immediate purchase orders.
-![Customer Analysis](https://github.com/user-attachments/assets/d3aa3344-5a3d-461c-aa84-39413293e65b)
-![Executive Summary](https://github.com/user-attachments/assets/855bd896-2755-4ae3-82a8-db08a49a081d)
-![Sales Analysis](https://github.com/user-attachments/assets/508c9e52-bbb3-461a-8db7-d61ae8539a0f)
 
 ---
 
