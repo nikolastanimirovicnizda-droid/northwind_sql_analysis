@@ -26,14 +26,6 @@ FROM order_totals ot
 GROUP BY order_year
 ORDER BY order_year
 
---Sales by Month and Year
-
-SELECT EXTRACT(YEAR FROM o.order_date) AS order_year, EXTRACT(MONTH FROM o.order_date) AS order_month, ROUND(SUM(od.unit_price * od.quantity * (1 - od.discount))::numeric,2) AS total_revenue
-FROM orders o 
-JOIN order_details od ON o.order_id = od.order_id
-GROUP BY order_year, order_month
-ORDER BY order_year DESC, order_month ASC
-
 --Sales by Country/Region
 
 SELECT c.country, ROUND(SUM(od.unit_price * od.quantity * (1 - od.discount))::numeric,2) AS total_revenue, COUNT(DISTINCT o.order_id) AS total_orders
@@ -63,20 +55,24 @@ FROM monthly_sales
 ORDER BY order_year, order_month
 
 
---Yearly Revenue Growth 
-
-WITH yearly_sales AS (
-	SELECT EXTRACT(YEAR FROM o.order_date) AS order_year, ROUND(SUM(od.unit_price * od.quantity * (1 - od.discount))::numeric,2) AS yearly_revenue
-	FROM orders o 
-	JOIN order_details od ON o.order_id = od.order_id
-	GROUP BY order_year
+-- Year-over-Year Revenue Growth (same month vs. previous year)
+WITH monthly_sales AS (
+    SELECT
+        DATE_TRUNC('month', o.order_date)::date AS month_start,
+        SUM(od.unit_price * od.quantity * (1 - od.discount)) AS revenue
+    FROM orders o
+    JOIN order_details od ON o.order_id = od.order_id
+    WHERE o.order_date < '1998-05-01'
+    GROUP BY 1
 )
-
-SELECT order_year, ROUND(yearly_revenue::numeric, 2) AS current_year_revenue, ROUND(LAG(yearly_revenue) OVER (ORDER BY order_year)::numeric, 2) AS previous_year_revenue,
-	ROUND(
-	((yearly_revenue) - LAG(yearly_revenue) OVER (ORDER BY order_year)) / LAG(yearly_revenue) OVER (ORDER BY order_year) * 100::numeric, 2) AS growth_percentage
-FROM yearly_sales
-ORDER BY order_year
+SELECT
+    month_start,
+    ROUND(revenue::numeric, 2) AS revenue,
+    ROUND(LAG(revenue, 12) OVER (ORDER BY month_start)::numeric, 2) AS same_month_last_year,
+    ROUND(((revenue - LAG(revenue, 12) OVER (ORDER BY month_start))
+           / LAG(revenue, 12) OVER (ORDER BY month_start) * 100)::numeric, 2) AS yoy_growth_pct
+FROM monthly_sales
+ORDER BY month_start;
 
 --Sales per Day
 
@@ -115,7 +111,7 @@ JOIN products p ON c.category_id = p.category_id
 JOIN order_details od ON od.product_id = p.product_id
 GROUP BY category_name
 ORDER BY total_revenue DESC
-LIMIT 10
+LIMIT 8
 
 --Products Below Order Level
 
@@ -126,14 +122,15 @@ ORDER BY units_in_stock
 
 --Discount Impact
 
-SELECT p.product_name, ROUND(AVG(od.discount)::numeric, 2) AS average_discount, SUM(od.quantity) AS total_units_sold
-FROM products p 
-JOIN order_details od ON p.product_id = od.product_id
-GROUP BY product_name
-ORDER BY average_discount DESC
-LIMIT 5
+ SELECT
+      CASE WHEN od.discount > 0 THEN 'Discounted' ELSE 'No discount' END AS discount_group,
+      COUNT(*) AS order_lines,
+      ROUND(AVG(od.quantity), 1) AS avg_units_per_line,
+      ROUND(SUM(od.unit_price * od.quantity * (1 - od.discount))::numeric, 2) AS revenue
+  FROM order_details od
+  GROUP BY discount_group;
 
---Most Sold Product in Each Category
+--Top Product by Revenue per Category
 
 SELECT DISTINCT ON(c.category_name) c.category_name, p.product_name, ROUND(SUM(od.unit_price * od.quantity * (1 - od.discount))::numeric, 2) AS product_revenue
 FROM categories c
@@ -174,7 +171,7 @@ JOIN orders o ON c.customer_id = o.customer_id
 GROUP BY company_name
 ORDER BY days_since_last_order DESC
 
---RFM per Customer
+--RFM inputs
 
 SELECT c.company_name, COUNT(DISTINCT o.order_id) AS number_of_orders, ROUND(SUM(od.unit_price * od.quantity * (1 - od.discount))::numeric, 2) AS total_revenue, (SELECT MAX(order_date) from orders) - MAX(o.order_date) AS days_since_last_order
 FROM orders o 
@@ -195,6 +192,7 @@ WITH total_revenue_customer AS (
 
 SELECT company_name, ROUND(total_spent::numeric, 2) AS total_spent, NTILE(4) OVER (ORDER BY total_spent DESC) AS customer_quartile
 FROM total_revenue_customer
+ORDER BY total_spent DESC
 
 --Customers with Only One Order
 
