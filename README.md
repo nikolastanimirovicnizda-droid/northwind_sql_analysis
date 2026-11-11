@@ -1,4 +1,4 @@
-[README_northwind.md](https://github.com/user-attachments/files/34687318/README_northwind.md)
+
 # Northwind Retail Analytics & Business Performance Report
 
 End-to-end analytics project on the classic Northwind trading database. It combines PostgreSQL analysis (CTEs, window functions, segmentation) with a 3-page interactive Power BI dashboard.
