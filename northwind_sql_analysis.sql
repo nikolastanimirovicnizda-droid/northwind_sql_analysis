@@ -120,6 +120,12 @@ FROM products
 WHERE units_in_stock <= reorder_level AND discontinued = 0
 ORDER BY units_in_stock
 
+--Products Still Below Reorder Level After Pending Orders Arrive
+
+SELECT product_name, units_in_stock, units_on_order, reorder_level
+FROM products
+WHERE units_in_stock + units_on_order < reorder_level AND discontinued = 0;
+
 --Discount Impact
 
  SELECT
